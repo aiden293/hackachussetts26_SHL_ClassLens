@@ -9,18 +9,36 @@ import {
   useState,
 } from "react";
 
-/** A teacher-uploaded syllabus reference. In production this points at a
- * Supabase Storage object; here we keep the file's metadata only. */
+/**
+ * A teacher-uploaded syllabus (PDF).
+ *
+ * For the demo the file content is stored inline as a data URL so it actually
+ * persists and can be viewed/downloaded without a backend. In production
+ * `dataUrl` is replaced by a Supabase Storage object URL.
+ */
 export type SyllabusRef = {
   fileName: string;
   sizeBytes: number;
   uploadedAt: string; // ISO date
+  /** base64 data URL of the file (demo-only persistence). */
+  dataUrl: string;
+};
+
+/** A teacher-uploaded course image (diagram, photo, etc.). */
+export type CourseImage = {
+  id: string;
+  fileName: string;
+  sizeBytes: number;
+  uploadedAt: string; // ISO date
+  /** base64 data URL of the image (demo-only persistence). */
+  dataUrl: string;
 };
 
 /** Mutable, teacher-editable fields layered on top of the static course. */
 export type CourseEdit = {
   description?: string;
   syllabus?: SyllabusRef;
+  images?: CourseImage[];
 };
 
 type CourseEditsMap = Record<string, CourseEdit>;
@@ -31,6 +49,8 @@ type CourseEditsContextValue = {
   updateDescription: (courseId: string, description: string) => void;
   setSyllabus: (courseId: string, syllabus: SyllabusRef) => void;
   removeSyllabus: (courseId: string) => void;
+  addImage: (courseId: string, image: CourseImage) => void;
+  removeImage: (courseId: string, imageId: string) => void;
 };
 
 const CourseEditsContext = createContext<CourseEditsContextValue | undefined>(
@@ -109,6 +129,31 @@ export function CourseEditsProvider({
     [edits, persist]
   );
 
+  const addImage = useCallback(
+    (courseId: string, image: CourseImage) => {
+      const existing = edits[courseId]?.images ?? [];
+      persist({
+        ...edits,
+        [courseId]: { ...edits[courseId], images: [...existing, image] },
+      });
+    },
+    [edits, persist]
+  );
+
+  const removeImage = useCallback(
+    (courseId: string, imageId: string) => {
+      const existing = edits[courseId]?.images ?? [];
+      persist({
+        ...edits,
+        [courseId]: {
+          ...edits[courseId],
+          images: existing.filter((img) => img.id !== imageId),
+        },
+      });
+    },
+    [edits, persist]
+  );
+
   const getEdit = useCallback(
     (courseId: string) => edits[courseId],
     [edits]
@@ -121,8 +166,18 @@ export function CourseEditsProvider({
       updateDescription,
       setSyllabus,
       removeSyllabus,
+      addImage,
+      removeImage,
     }),
-    [edits, getEdit, updateDescription, setSyllabus, removeSyllabus]
+    [
+      edits,
+      getEdit,
+      updateDescription,
+      setSyllabus,
+      removeSyllabus,
+      addImage,
+      removeImage,
+    ]
   );
 
   return (

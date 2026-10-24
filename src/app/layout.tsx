@@ -27,7 +27,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      {/* suppressHydrationWarning: browser extensions (e.g. Grammarly) inject
+          data-gr-* / data-new-gr-* attributes onto <body> after the server
+          HTML is sent, which otherwise triggers a hydration mismatch warning.
+          This only suppresses attribute diffs on <body> itself, not its tree. */}
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <Providers>
           <Navbar />
           <main className="flex-1">{children}</main>

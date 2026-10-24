@@ -2,11 +2,20 @@ import Link from "next/link";
 import CourseSearch from "@/components/CourseSearch";
 import { sampleCourses } from "@/lib/data/courses";
 
+// Derive headline stats from the actual catalog so they stay accurate as the
+// course list changes (currently scoped to CS).
+const uniqueProfessors = new Set(sampleCourses.map((c) => c.professor)).size;
+const totalReviews = sampleCourses.reduce((sum, c) => sum + c.reviewsCount, 0);
+const avgRating =
+  sampleCourses.length > 0
+    ? sampleCourses.reduce((sum, c) => sum + c.rating, 0) / sampleCourses.length
+    : 0;
+
 const stats = [
-  { label: "Courses", value: "12+" },
-  { label: "Professors", value: "12+" },
-  { label: "Reviews", value: "1.4k+" },
-  { label: "Avg. rating", value: "4.0" },
+  { label: "Courses", value: String(sampleCourses.length) },
+  { label: "Professors", value: String(uniqueProfessors) },
+  { label: "Reviews", value: totalReviews.toLocaleString() },
+  { label: "Avg. rating", value: avgRating.toFixed(1) },
 ];
 
 const features = [
@@ -77,7 +86,7 @@ export default function Home() {
               <CourseSearch />
               <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-muted">
                 <span>Try:</span>
-                {["CS 111", "Calculus", "Software Engineering"].map((term) => (
+                {["CS 111", "Algorithms", "Software Engineering"].map((term) => (
                   <Link
                     key={term}
                     href={`/courses?q=${encodeURIComponent(term)}`}

@@ -13,6 +13,19 @@ const navLinks = [
   { href: "/recommend", label: "Recommend" },
 ];
 
+/** Honorific titles to skip when picking a display first name. */
+const TITLES = new Set(["dr.", "dr", "prof.", "prof", "professor", "mr.", "ms.", "mrs."]);
+
+/** Pick the given name from a full name, skipping a leading title like "Dr.". */
+function firstName(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  const first = parts[0] ?? fullName;
+  if (parts.length > 1 && TITLES.has(first.toLowerCase())) {
+    return parts[1];
+  }
+  return first;
+}
+
 export default function Navbar() {
   const pathname = usePathname();
   const { user, isTeacher, signOut } = useAuth();
@@ -95,7 +108,7 @@ export default function Navbar() {
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-semibold text-brand-foreground">
                   {user.avatarInitials}
                 </span>
-                <span className="text-sm font-medium">{user.name.split(" ")[0]}</span>
+                <span className="text-sm font-medium">{firstName(user.name)}</span>
                 {isTeacher && (
                   <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-ink">
                     Teacher

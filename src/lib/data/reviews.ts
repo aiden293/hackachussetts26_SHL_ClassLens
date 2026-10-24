@@ -182,31 +182,6 @@ export const sampleReviews: Review[] = [
     createdAt: "2024-12-16",
   },
 
-  // ---- A couple on an unowned course for contrast ----
-  {
-    id: "r-123-1",
-    courseId: "cas-ma-123",
-    author: "Anonymous",
-    rating: 3,
-    workloadHours: 8,
-    difficulty: 4,
-    wouldTakeAgain: true,
-    semester: "Fall 2025",
-    body: "Standard calculus course. Lectures are fine, exams are difficult. Do the practice problems and you will be okay.",
-    createdAt: "2025-12-10",
-  },
-  {
-    id: "r-123-2",
-    courseId: "cas-ma-123",
-    author: "Taylor M.",
-    rating: 4,
-    workloadHours: 6,
-    difficulty: 3,
-    wouldTakeAgain: true,
-    semester: "Spring 2025",
-    body: "Clear explanations and helpful recitations. Manageable workload if you keep up weekly.",
-    createdAt: "2025-05-05",
-  },
 ];
 
 /** All reviews for a single course, newest first. */

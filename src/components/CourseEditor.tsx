@@ -4,8 +4,12 @@ import { useRef, useState } from "react";
 import type { Course } from "@/lib/data/courses";
 import { useCourseEdits } from "@/lib/courses/CourseEditsProvider";
 
-const MAX_SYLLABUS_BYTES = 10 * 1024 * 1024; // 10 MB
-const ACCEPTED = [".pdf", ".doc", ".docx"];
+// Limits are kept modest because the demo persists files in localStorage
+// (~5 MB total per origin). Supabase Storage will lift these later.
+const MAX_SYLLABUS_BYTES = 4 * 1024 * 1024; // 4 MB
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024; // 2 MB
+const SYLLABUS_ACCEPT = ".pdf";
+const IMAGE_ACCEPT = "image/png,image/jpeg,image/gif,image/webp";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -13,22 +17,44 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+/** Read a File into a base64 data URL. */
+function readAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
 /**
- * Teacher-only editor for a course's description and syllabus.
+ * Teacher-only editor for a course's description, syllabus (PDF), and images.
  * Persists to the CourseEditsProvider (localStorage for the demo).
  */
 export default function CourseEditor({ course }: { course: Course }) {
-  const { getEdit, updateDescription, setSyllabus, removeSyllabus } =
-    useCourseEdits();
+  const {
+    getEdit,
+    updateDescription,
+    setSyllabus,
+    removeSyllabus,
+    addImage,
+    removeImage,
+  } = useCourseEdits();
   const edit = getEdit(course.id);
 
   const currentDescription = edit?.description ?? course.description;
   const [draft, setDraft] = useState(currentDescription);
   const [savedAt, setSavedAt] = useState<string | null>(null);
-  const [fileError, setFileError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [syllabusError, setSyllabusError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const syllabusInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const syllabus = edit?.syllabus;
+  const images = edit?.images ?? [];
   const dirty = draft.trim() !== currentDescription.trim();
 
   function handleSave() {
@@ -36,29 +62,72 @@ export default function CourseEditor({ course }: { course: Course }) {
     setSavedAt(new Date().toLocaleTimeString());
   }
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    setFileError(null);
+  async function handleSyllabus(e: React.ChangeEvent<HTMLInputElement>) {
+    setSyllabusError(null);
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const ext = file.name
-      .slice(file.name.lastIndexOf("."))
-      .toLowerCase();
-    if (!ACCEPTED.includes(ext)) {
-      setFileError(`Unsupported file type. Accepted: ${ACCEPTED.join(", ")}`);
+    if (file.type !== "application/pdf") {
+      setSyllabusError("Syllabus must be a PDF.");
       return;
     }
     if (file.size > MAX_SYLLABUS_BYTES) {
-      setFileError("File is too large (max 10 MB).");
+      setSyllabusError(
+        `PDF is too large (max ${formatBytes(MAX_SYLLABUS_BYTES)}).`
+      );
       return;
     }
 
-    setSyllabus(course.id, {
-      fileName: file.name,
-      sizeBytes: file.size,
-      uploadedAt: new Date().toISOString(),
-    });
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    try {
+      setBusy(true);
+      const dataUrl = await readAsDataUrl(file);
+      setSyllabus(course.id, {
+        fileName: file.name,
+        sizeBytes: file.size,
+        uploadedAt: new Date().toISOString(),
+        dataUrl,
+      });
+    } catch {
+      setSyllabusError("Could not read the file. It may be too large to store.");
+    } finally {
+      setBusy(false);
+      if (syllabusInputRef.current) syllabusInputRef.current.value = "";
+    }
+  }
+
+  async function handleImages(e: React.ChangeEvent<HTMLInputElement>) {
+    setImageError(null);
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+
+    try {
+      setBusy(true);
+      for (const file of files) {
+        if (!file.type.startsWith("image/")) {
+          setImageError("Only image files are allowed.");
+          continue;
+        }
+        if (file.size > MAX_IMAGE_BYTES) {
+          setImageError(
+            `"${file.name}" is too large (max ${formatBytes(MAX_IMAGE_BYTES)}).`
+          );
+          continue;
+        }
+        const dataUrl = await readAsDataUrl(file);
+        addImage(course.id, {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          fileName: file.name,
+          sizeBytes: file.size,
+          uploadedAt: new Date().toISOString(),
+          dataUrl,
+        });
+      }
+    } catch {
+      setImageError("Could not store one or more images (storage may be full).");
+    } finally {
+      setBusy(false);
+      if (imageInputRef.current) imageInputRef.current.value = "";
+    }
   }
 
   return (
@@ -101,9 +170,9 @@ export default function CourseEditor({ course }: { course: Course }) {
         </div>
       </div>
 
-      {/* Syllabus upload */}
+      {/* Syllabus upload (PDF) */}
       <div className="rounded-xl border border-border bg-card p-5">
-        <h3 className="text-sm font-semibold">Syllabus</h3>
+        <h3 className="text-sm font-semibold">Syllabus (PDF)</h3>
         {syllabus ? (
           <div className="mt-3 flex items-center justify-between rounded-lg border border-border bg-background p-3">
             <div className="flex items-center gap-3">
@@ -118,38 +187,121 @@ export default function CourseEditor({ course }: { course: Course }) {
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => removeSyllabus(course.id)}
-              className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:border-red-400 hover:text-negative"
-            >
-              Remove
-            </button>
+            <div className="flex gap-2">
+              <a
+                href={syllabus.dataUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:border-brand"
+              >
+                View
+              </a>
+              <button
+                type="button"
+                onClick={() => removeSyllabus(course.id)}
+                className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:border-red-400 hover:text-negative"
+              >
+                Remove
+              </button>
+            </div>
           </div>
         ) : (
-          <p className="mt-2 text-sm text-muted">
-            No syllabus uploaded yet.
-          </p>
+          <p className="mt-2 text-sm text-muted">No syllabus uploaded yet.</p>
         )}
 
         <div className="mt-3">
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium transition-colors hover:border-brand">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium transition-colors hover:border-brand aria-disabled:opacity-50">
             <UploadIcon />
-            {syllabus ? "Replace syllabus" : "Upload syllabus"}
+            {syllabus ? "Replace PDF" : "Upload PDF"}
             <input
-              ref={fileInputRef}
+              ref={syllabusInputRef}
               type="file"
-              accept={ACCEPTED.join(",")}
-              onChange={handleFile}
+              accept={SYLLABUS_ACCEPT}
+              onChange={handleSyllabus}
+              disabled={busy}
               className="hidden"
             />
           </label>
           <p className="mt-2 text-xs text-muted">
-            PDF, DOC, or DOCX up to 10 MB. Files are stored locally in this demo;
-            Supabase Storage will handle real uploads later.
+            PDF up to {formatBytes(MAX_SYLLABUS_BYTES)}. Stored locally in this
+            demo; Supabase Storage will handle real uploads later.
           </p>
-          {fileError && (
-            <p className="mt-2 text-xs text-negative">{fileError}</p>
+          {syllabusError && (
+            <p className="mt-2 text-xs text-negative">{syllabusError}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Course images */}
+      <div className="rounded-xl border border-border bg-card p-5">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold">Course images</h3>
+          <span className="text-xs text-muted">{images.length} uploaded</span>
+        </div>
+
+        {images.length > 0 ? (
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {images.map((img) => (
+              <figure
+                key={img.id}
+                className="group relative overflow-hidden rounded-lg border border-border bg-background"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={img.dataUrl}
+                  alt={img.fileName}
+                  className="h-28 w-full object-cover"
+                />
+                <figcaption className="truncate px-2 py-1 text-xs text-muted">
+                  {img.fileName}
+                </figcaption>
+                <button
+                  type="button"
+                  onClick={() => removeImage(course.id, img.id)}
+                  aria-label={`Remove ${img.fileName}`}
+                  className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-4 w-4"
+                  >
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                  </svg>
+                </button>
+              </figure>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-2 text-sm text-muted">No images uploaded yet.</p>
+        )}
+
+        <div className="mt-3">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium transition-colors hover:border-brand">
+            <ImageIcon />
+            Add images
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept={IMAGE_ACCEPT}
+              multiple
+              onChange={handleImages}
+              disabled={busy}
+              className="hidden"
+            />
+          </label>
+          <p className="mt-2 text-xs text-muted">
+            PNG, JPG, GIF, or WEBP up to {formatBytes(MAX_IMAGE_BYTES)} each. You
+            can select multiple.
+          </p>
+          {imageError && (
+            <p className="mt-2 text-xs text-negative">{imageError}</p>
           )}
         </div>
       </div>
@@ -190,6 +342,25 @@ function UploadIcon() {
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <path d="M17 8l-5-5-5 5" />
       <path d="M12 3v12" />
+    </svg>
+  );
+}
+
+function ImageIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+    >
+      <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+      <circle cx="9" cy="9" r="2" />
+      <path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21" />
     </svg>
   );
 }

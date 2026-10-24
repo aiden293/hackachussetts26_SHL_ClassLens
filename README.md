@@ -4,7 +4,8 @@ AI-powered university course discovery platform built for Hackachusetts 2026.
 
 ClassLens combines Rate My Professors-style reviews, Reddit-style discussions,
 and official professor perspectives — with AI course recommendations on the
-way. We're starting with Boston University.
+way. We're starting with Boston University, scoped to **CAS Computer Science**
+courses for the initial launch and expanding to the full catalog soon.
 
 ## Tech Stack
 
@@ -39,8 +40,14 @@ ClassLens has two signed-in roles plus anonymous readers:
   saved courses and activity.
 - **Teacher** — reader access plus a teacher portal (`/teacher`) where they can:
   - Edit the description of courses they own
-  - Upload a syllabus (PDF/DOC/DOCX)
+  - Upload a syllabus **PDF** (viewable/downloadable) and **course images**
+    (PNG/JPG/GIF/WEBP, multiple)
   - Run the **review analyzer** on their courses
+
+  Uploaded files are stored inline as base64 data URLs in localStorage for the
+  demo (so they actually persist and render), with modest size limits
+  (4 MB syllabus, 2 MB per image). Supabase Storage replaces this later. The
+  syllabus and image gallery also appear on the public course detail page.
 
 Auth is currently a **mock provider** (React context + localStorage) so the
 full flow is demoable without a backend. Sign in from `/signin` and pick a demo
@@ -82,7 +89,7 @@ src/
 │   ├── layout.tsx            # Root layout (Providers + Navbar + Footer)
 │   ├── page.tsx              # Homepage (hero + course search)
 │   ├── courses/
-│   │   ├── page.tsx          # Course listing with search
+│   │   ├── page.tsx          # Course listing: browse by college/major + search
 │   │   └── [id]/page.tsx     # Course detail (desc, reviews, syllabus)
 │   ├── teacher/page.tsx      # Teacher portal (edit + review analyzer)
 │   ├── dashboard/page.tsx    # Student dashboard
@@ -97,6 +104,7 @@ src/
 │   ├── Footer.tsx
 │   ├── Providers.tsx         # Client context providers wrapper
 │   ├── CourseSearch.tsx      # Live search with dropdown
+│   ├── CourseFilters.tsx     # Sidebar: college → major drill-down + search
 │   ├── CourseDescription.tsx # Edited description + syllabus + owner edit link
 │   ├── CourseReviews.tsx     # Public review list
 │   ├── CourseEditor.tsx      # Teacher: edit description + upload syllabus

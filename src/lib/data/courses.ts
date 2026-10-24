@@ -61,118 +61,6 @@ export const sampleCourses: Course[] = [
     semester: "Fall & Spring",
   },
   {
-    id: "cas-ma-123",
-    college: "CAS",
-    department: "MA",
-    number: "123",
-    code: "CAS MA 123",
-    title: "Calculus I",
-    credits: 4,
-    professor: "Glenn Berman",
-    description:
-      "Limits, derivatives, techniques of differentiation, and applications to maxima and minima. Introduction to integration.",
-    rating: 3.8,
-    reviewsCount: 211,
-    level: "Undergraduate",
-    semester: "Fall & Spring",
-  },
-  {
-    id: "cas-ma-225",
-    college: "CAS",
-    department: "MA",
-    number: "225",
-    code: "CAS MA 225",
-    title: "Multivariate Calculus",
-    credits: 4,
-    professor: "David Campbell",
-    description:
-      "Vectors, lines, planes, partial derivatives, multiple integrals, and vector calculus including Green's and Stokes' theorems.",
-    rating: 3.9,
-    reviewsCount: 142,
-    level: "Undergraduate",
-    semester: "Fall & Spring",
-  },
-  {
-    id: "cas-ec-101",
-    college: "CAS",
-    department: "EC",
-    number: "101",
-    code: "CAS EC 101",
-    title: "Introductory Microeconomic Analysis",
-    credits: 4,
-    professor: "Michael Kiley",
-    description:
-      "Consumer behavior, theory of the firm, market structures, and resource allocation in a market economy.",
-    rating: 4.0,
-    reviewsCount: 187,
-    level: "Undergraduate",
-    semester: "Fall & Spring",
-  },
-  {
-    id: "cas-bi-108",
-    college: "CAS",
-    department: "BI",
-    number: "108",
-    code: "CAS BI 108",
-    title: "Lab Investigations in Cell and Molecular Biology",
-    credits: 4,
-    professor: "Lynne Neuman",
-    description:
-      "Laboratory component exploring modern techniques in cell and molecular biology, including DNA isolation and PCR.",
-    rating: 3.6,
-    reviewsCount: 74,
-    level: "Undergraduate",
-    semester: "Spring",
-  },
-  {
-    id: "eng-ek-125",
-    college: "ENG",
-    department: "EK",
-    number: "125",
-    code: "ENG EK 125",
-    title: "Introduction to Engineering Computing",
-    credits: 4,
-    professor: "Christos Zacharia",
-    description:
-      "Introduction to programming with MATLAB and Python for engineering applications, numerical methods, and data visualization.",
-    rating: 4.2,
-    reviewsCount: 63,
-    level: "Undergraduate",
-    semester: "Fall",
-  },
-  {
-    id: "com-cm-101",
-    college: "COM",
-    department: "CM",
-    number: "101",
-    code: "COM CM 101",
-    title: "The World of Communication",
-    credits: 4,
-    professor: "James Shanahan",
-    description:
-      "Survey of mass communication theories, media industries, and the role of communication in society and culture.",
-    rating: 4.4,
-    reviewsCount: 156,
-    level: "Undergraduate",
-    semester: "Fall & Spring",
-  },
-  {
-    id: "qst-fe-101",
-    college: "QST",
-    department: "FE",
-    number: "101",
-    code: "QST FE 101",
-    title: "Financial Accounting",
-    credits: 4,
-    professor: "Gregory Stoller",
-    description:
-      "Introduction to financial statements, the accounting cycle, and the analysis of corporate financial reports.",
-    rating: 3.7,
-    reviewsCount: 119,
-    level: "Undergraduate",
-    semester: "Fall & Spring",
-  },
-  {
     id: "cas-cs-330",
     college: "CAS",
     department: "CS",
@@ -206,32 +94,109 @@ export const sampleCourses: Course[] = [
     level: "Undergraduate",
     semester: "Fall",
   },
+];
+
+/* -------------------------------------------------------------------------- */
+/* College & department (major) taxonomy                                      */
+/* -------------------------------------------------------------------------- */
+
+export type Department = {
+  /** Short code used in course codes, e.g. "CS". */
+  code: string;
+  name: string;
+};
+
+export type College = {
+  /** Short code, e.g. "CAS". */
+  code: string;
+  name: string;
+  departments: Department[];
+};
+
+/**
+ * BU colleges and their departments/majors.
+ *
+ * Intentionally scoped to CAS → Computer Science for the initial launch. The
+ * filter UI and `College`/`Department` structure are kept general so this list
+ * can be expanded to the full catalog (CDS, ENG, COM, QST, …) soon — just add
+ * more entries here. Departments present in `sampleCourses` are also guaranteed
+ * to appear via `getColleges()` below, even if not hardcoded.
+ */
+export const colleges: College[] = [
   {
-    id: "cas-ps-101",
-    college: "CAS",
-    department: "PS",
-    number: "101",
-    code: "CAS PS 101",
-    title: "General Psychology",
-    credits: 4,
-    professor: "Helen Cronin",
-    description:
-      "Scientific study of human behavior, including learning, memory, perception, development, and social psychology.",
-    rating: 4.1,
-    reviewsCount: 203,
-    level: "Undergraduate",
-    semester: "Fall & Spring",
+    code: "CAS",
+    name: "College of Arts & Sciences",
+    departments: [{ code: "CS", name: "Computer Science" }],
   },
 ];
+
+/**
+ * Colleges augmented with any department codes that appear in course data but
+ * aren't hardcoded above, so the filters never hide real courses. Department
+ * display names fall back to the code when unknown.
+ */
+export function getColleges(): College[] {
+  const byCode = new Map<string, College>(
+    colleges.map((c) => [c.code, { ...c, departments: [...c.departments] }])
+  );
+
+  for (const course of sampleCourses) {
+    let college = byCode.get(course.college);
+    if (!college) {
+      college = { code: course.college, name: course.college, departments: [] };
+      byCode.set(course.college, college);
+    }
+    if (!college.departments.some((d) => d.code === course.department)) {
+      college.departments.push({
+        code: course.department,
+        name: course.department,
+      });
+    }
+  }
+
+  return Array.from(byCode.values()).sort((a, b) =>
+    a.code.localeCompare(b.code)
+  );
+}
+
+export function getCollegeByCode(code: string): College | undefined {
+  return getColleges().find((c) => c.code === code);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Search & filtering                                                         */
+/* -------------------------------------------------------------------------- */
+
+export type CourseFilters = {
+  query?: string;
+  college?: string;
+  department?: string;
+};
+
+/**
+ * Combined filter: applies college, department, and free-text query together.
+ * Any field left empty is ignored. Returns all courses when no filters are set.
+ */
+export function filterCourses(filters: CourseFilters): Course[] {
+  const q = filters.query?.trim().toLowerCase() ?? "";
+
+  return sampleCourses.filter((c) => {
+    if (filters.college && c.college !== filters.college) return false;
+    if (filters.department && c.department !== filters.department) return false;
+    if (q) {
+      const haystack =
+        `${c.code} ${c.title} ${c.department} ${c.professor} ${c.college}`.toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  });
+}
 
 /** Search courses by query string against code, title, department, and professor. */
 export function searchCourses(query: string): Course[] {
   const q = query.trim().toLowerCase();
   if (!q) return [];
-  return sampleCourses.filter((c) => {
-    const haystack = `${c.code} ${c.title} ${c.department} ${c.professor} ${c.college}`.toLowerCase();
-    return haystack.includes(q);
-  });
+  return filterCourses({ query: q });
 }
 
 export function getCourseById(id: string): Course | undefined {

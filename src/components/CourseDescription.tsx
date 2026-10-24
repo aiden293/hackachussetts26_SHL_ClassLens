@@ -23,6 +23,7 @@ export default function CourseDescription({
 
   const description = edit?.description ?? fallbackDescription;
   const syllabus = edit?.syllabus;
+  const images = edit?.images ?? [];
   const isOwner = isTeacher && user?.id === ownerId;
 
   return (
@@ -50,9 +51,39 @@ export default function CourseDescription({
             <p className="text-sm font-medium">Syllabus available</p>
             <p className="text-xs text-muted">{syllabus.fileName}</p>
           </div>
-          <span className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted">
-            Uploaded by instructor
-          </span>
+          <a
+            href={syllabus.dataUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg border border-brand px-3 py-1.5 text-xs font-medium text-brand-ink transition-colors hover:bg-brand/5"
+          >
+            View syllabus
+          </a>
+        </div>
+      )}
+
+      {images.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold">Course images</h3>
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {images.map((img) => (
+              <a
+                key={img.id}
+                href={img.dataUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group overflow-hidden rounded-lg border border-border bg-card"
+                title={img.fileName}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={img.dataUrl}
+                  alt={img.fileName}
+                  className="h-32 w-full object-cover transition-transform group-hover:scale-105"
+                />
+              </a>
+            ))}
+          </div>
         </div>
       )}
     </div>
