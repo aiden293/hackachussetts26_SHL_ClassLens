@@ -55,7 +55,7 @@ export default async function CoursesPage({
             defaultValue={query ?? ""}
             placeholder="Search by course code or title, e.g. CS 111"
             aria-label="Search courses"
-            className="w-full rounded-xl border border-border bg-card py-3 pl-12 pr-4 text-base outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+            className="w-full rounded-xl border border-border bg-card py-3 pl-12 pr-4 text-base outline-none transition focus:border-brand"
           />
         </div>
         <button
@@ -90,15 +90,15 @@ export default async function CoursesPage({
               className="group flex flex-col rounded-xl border border-border bg-card p-5 transition-colors hover:border-brand"
             >
               <div className="flex items-center justify-between">
-                <span className="font-mono text-sm font-medium text-brand">
+                <span className="font-mono text-sm font-medium text-brand-ink">
                   {course.code}
                 </span>
-                <span className="flex items-center gap-1 text-sm text-amber-500">
+                <span className="flex items-center gap-1 text-sm font-medium text-rating-ink">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="currentColor"
-                    className="h-4 w-4"
+                    className="h-4 w-4 text-amber-500"
                   >
                     <path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.8 6.1 20.8l1.2-6.6L2.5 9.6l6.6-.9z" />
                   </svg>

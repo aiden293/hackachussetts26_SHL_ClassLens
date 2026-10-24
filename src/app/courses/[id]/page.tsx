@@ -30,14 +30,14 @@ export default async function CourseDetailPage({
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
       <Link
         href="/courses"
-        className="text-sm font-medium text-brand hover:underline"
+        className="text-sm font-medium text-brand-ink hover:underline"
       >
         ← Back to courses
       </Link>
 
       <div className="mt-6">
         <div className="flex items-center gap-3">
-          <span className="font-mono text-sm font-medium text-brand">
+          <span className="font-mono text-sm font-medium text-brand-ink">
             {course.code}
           </span>
           <span className="rounded-full border border-border px-3 py-0.5 text-xs text-muted">
@@ -55,7 +55,7 @@ export default async function CourseDetailPage({
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-border bg-card p-4 text-center">
-          <div className="text-2xl font-bold text-amber-500">
+          <div className="text-2xl font-bold text-rating-ink">
             {course.rating.toFixed(1)}
           </div>
           <div className="text-xs text-muted">Rating ({course.reviewsCount} reviews)</div>
@@ -104,7 +104,7 @@ export default async function CourseDetailPage({
                 href={`/courses/${c.id}`}
                 className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-brand"
               >
-                <div className="font-mono text-sm font-medium text-brand">
+                <div className="font-mono text-sm font-medium text-brand-ink">
                   {c.code}
                 </div>
                 <div className="mt-1 line-clamp-2 text-sm font-medium">

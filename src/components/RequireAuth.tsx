@@ -52,7 +52,7 @@ export default function RequireAuth({
 function Gate({ title, message }: { title: string; message: string }) {
   return (
     <div className="mx-auto flex max-w-xl flex-col items-center px-4 py-24 text-center sm:px-6">
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 text-brand-ink">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"

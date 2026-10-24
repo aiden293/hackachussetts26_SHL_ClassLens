@@ -59,7 +59,7 @@ function Dashboard() {
           <h2 className="text-xl font-bold tracking-tight">Saved courses</h2>
           <Link
             href="/courses"
-            className="text-sm font-medium text-brand hover:underline"
+            className="text-sm font-medium text-brand-ink hover:underline"
           >
             Browse all →
           </Link>
@@ -71,7 +71,7 @@ function Dashboard() {
               href={`/courses/${course.id}`}
               className="rounded-xl border border-border bg-card p-5 transition-colors hover:border-brand"
             >
-              <div className="font-mono text-sm font-medium text-brand">
+              <div className="font-mono text-sm font-medium text-brand-ink">
                 {course.code}
               </div>
               <h3 className="mt-2 line-clamp-2 font-semibold leading-snug">
@@ -106,7 +106,7 @@ function ActionCard({
       href={href}
       className="group rounded-xl border border-border bg-card p-5 transition-colors hover:border-brand"
     >
-      <h3 className="font-semibold group-hover:text-brand">{title}</h3>
+      <h3 className="font-semibold group-hover:text-brand-ink">{title}</h3>
       <p className="mt-1 text-sm text-muted">{description}</p>
     </Link>
   );

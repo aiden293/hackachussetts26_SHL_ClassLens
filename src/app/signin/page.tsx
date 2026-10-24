@@ -37,7 +37,7 @@ export default function SignInPage() {
           <button
             type="button"
             onClick={signOut}
-            className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:border-red-400 hover:text-red-600"
+            className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:border-red-400 hover:text-negative"
           >
             Sign out
           </button>
@@ -67,7 +67,7 @@ export default function SignInPage() {
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide ${
                 account.role === "teacher"
-                  ? "bg-brand/10 text-brand"
+                  ? "bg-brand/10 text-brand-ink"
                   : "bg-background text-muted"
               }`}
             >

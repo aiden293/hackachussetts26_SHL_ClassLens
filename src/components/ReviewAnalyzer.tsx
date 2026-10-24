@@ -11,9 +11,9 @@ import {
 } from "@/lib/data/reviews";
 
 const sentimentColor: Record<string, string> = {
-  positive: "text-emerald-600",
-  neutral: "text-amber-600",
-  negative: "text-red-600",
+  positive: "text-positive",
+  neutral: "text-neutral",
+  negative: "text-negative",
 };
 
 const sentimentBg: Record<string, string> = {
@@ -213,7 +213,7 @@ function DeltaBadge({
     return <span className="text-xs text-muted">no change</span>;
   }
   const improved = higherIsBetter ? rounded > 0 : rounded < 0;
-  const color = improved ? "text-emerald-600" : "text-red-600";
+  const color = improved ? "text-positive" : "text-negative";
   const arrow = rounded > 0 ? "▲" : "▼";
   return (
     <span className={`inline-flex items-center gap-1 text-xs font-medium ${color}`}>
@@ -381,7 +381,7 @@ function SelectorChip({
           : "border-border bg-card hover:border-brand"
       }`}
     >
-      <div className={`text-sm font-medium ${active ? "text-brand" : ""}`}>
+      <div className={`text-sm font-medium ${active ? "text-brand-ink" : ""}`}>
         {label}
       </div>
       <div className="text-xs text-muted">{sublabel}</div>
@@ -400,7 +400,7 @@ function Stat({
 }) {
   return (
     <div className="rounded-xl border border-border bg-card p-4 text-center">
-      <div className={`text-2xl font-bold ${accent ? "text-amber-500" : ""}`}>
+      <div className={`text-2xl font-bold ${accent ? "text-rating-ink" : ""}`}>
         {value}
       </div>
       <div className="mt-1 text-xs text-muted">{label}</div>
@@ -418,7 +418,7 @@ function SparkIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-4 w-4 text-brand"
+      className="h-4 w-4 text-brand-ink"
     >
       <path d="M12 3v3" />
       <path d="M12 18v3" />
@@ -442,7 +442,7 @@ function TrendIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-4 w-4 text-brand"
+      className="h-4 w-4 text-brand-ink"
     >
       <path d="M3 3v18h18" />
       <path d="m19 9-5 5-4-4-3 3" />

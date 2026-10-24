@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <div className="mx-auto flex max-w-xl flex-col items-center px-4 py-28 text-center sm:px-6">
-      <p className="font-mono text-sm font-medium text-brand">404</p>
+      <p className="font-mono text-sm font-medium text-brand-ink">404</p>
       <h1 className="mt-4 text-3xl font-bold tracking-tight">
         This page isn&apos;t on the syllabus
       </h1>

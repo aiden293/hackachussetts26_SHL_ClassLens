@@ -71,7 +71,7 @@ export default function CourseSearch() {
             onFocus={() => setOpen(true)}
             placeholder="Search by course code or title, e.g. CS 111"
             aria-label="Search courses"
-            className="w-full rounded-xl border border-border bg-card py-3.5 pl-12 pr-4 text-base text-foreground shadow-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+            className="w-full rounded-xl border border-border bg-card py-3.5 pl-12 pr-4 text-base text-foreground shadow-sm outline-none transition focus:border-brand"
           />
         </div>
         <button
@@ -93,7 +93,7 @@ export default function CourseSearch() {
               className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-background"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="font-mono text-sm font-medium text-brand">
+                <span className="font-mono text-sm font-medium text-brand-ink">
                   {course.code}
                 </span>
                 <span className="flex items-center gap-1 text-xs text-muted">

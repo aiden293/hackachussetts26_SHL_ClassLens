@@ -35,7 +35,7 @@ export default function Navbar() {
   const portalLabel = isTeacher ? "Teacher portal" : "My dashboard";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-t-[3px] border-t-brand border-b border-border bg-card/80 backdrop-blur-md">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-semibold">
@@ -66,7 +66,9 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  active ? "text-brand" : "text-muted hover:text-foreground"
+                  active
+                    ? "rounded-none text-foreground shadow-[inset_0_-2px_0_var(--brand)]"
+                    : "text-muted hover:text-foreground"
                 }`}
               >
                 {link.label}
@@ -95,7 +97,7 @@ export default function Navbar() {
                 </span>
                 <span className="text-sm font-medium">{user.name.split(" ")[0]}</span>
                 {isTeacher && (
-                  <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand">
+                  <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-brand-ink">
                     Teacher
                   </span>
                 )}
@@ -133,7 +135,7 @@ export default function Navbar() {
                       signOut();
                       setMenuOpen(false);
                     }}
-                    className="block w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-background"
+                    className="block w-full rounded-lg px-3 py-2 text-left text-sm text-negative hover:bg-background"
                   >
                     Sign out
                   </button>
@@ -214,7 +216,7 @@ export default function Navbar() {
                     signOut();
                     setOpen(false);
                   }}
-                  className="block w-full rounded-md px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-background"
+                  className="block w-full rounded-md px-3 py-2 text-left text-sm font-medium text-negative hover:bg-background"
                 >
                   Sign out
                 </button>

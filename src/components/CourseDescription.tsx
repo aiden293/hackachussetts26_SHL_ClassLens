@@ -32,7 +32,7 @@ export default function CourseDescription({
         {isOwner && (
           <Link
             href="/teacher"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-brand px-3 py-1.5 text-sm font-medium text-brand transition-colors hover:bg-brand/5"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-brand px-3 py-1.5 text-sm font-medium text-brand-ink transition-colors hover:bg-brand/5"
           >
             <PencilIcon />
             Edit in portal
@@ -43,7 +43,7 @@ export default function CourseDescription({
 
       {syllabus && (
         <div className="mt-4 flex items-center gap-3 rounded-xl border border-border bg-card p-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand-ink">
             <FileIcon />
           </span>
           <div className="flex-1">

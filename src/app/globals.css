@@ -1,13 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  /* BU red, black and white */
+  --background: #fafafa;
+  --foreground: #171717;
   --card: #ffffff;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  --brand: #4f46e5;
+  --muted: #666666;
+  --border: #e5e5e5;
+  --brand: #cc0000;
   --brand-foreground: #ffffff;
+  /* Red text (codes, links, numbers) — stays readable in dark mode */
+  --brand-ink: #cc0000;
+  /* Rating number next to the amber star */
+  --rating-ink: #b45309;
+  /* Sentiment text */
+  --positive: #047857;
+  --neutral: #b45309;
+  --negative: #b91c1c;
+  /* Keyboard focus outline — ink, so it never reads as an error */
+  --focus-ring: #171717;
 }
 
 @theme inline {
@@ -18,19 +29,30 @@
   --color-border: var(--border);
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
+  --color-brand-ink: var(--brand-ink);
+  --color-rating-ink: var(--rating-ink);
+  --color-positive: var(--positive);
+  --color-neutral: var(--neutral);
+  --color-negative: var(--negative);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b1120;
-    --foreground: #e2e8f0;
-    --card: #111827;
-    --muted: #94a3b8;
-    --border: #1e293b;
-    --brand: #6366f1;
+    --background: #0a0a0a;
+    --foreground: #e5e5e5;
+    --card: #171717;
+    --muted: #a3a3a3;
+    --border: #262626;
+    --brand: #cc0000;
     --brand-foreground: #ffffff;
+    --brand-ink: #ff8080;
+    --rating-ink: #fbbf24;
+    --positive: #34d399;
+    --neutral: #fbbf24;
+    --negative: #f87171;
+    --focus-ring: #e5e5e5;
   }
 }
 
@@ -39,6 +61,12 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Always-visible keyboard focus */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* Subtle scrollbar for search dropdowns */

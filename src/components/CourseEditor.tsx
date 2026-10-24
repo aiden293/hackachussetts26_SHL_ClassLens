@@ -68,14 +68,14 @@ export default function CourseEditor({ course }: { course: Course }) {
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold">Course description</h3>
           {savedAt && (
-            <span className="text-xs text-emerald-600">Saved at {savedAt}</span>
+            <span className="text-xs text-positive">Saved at {savedAt}</span>
           )}
         </div>
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           rows={5}
-          className="mt-3 w-full resize-y rounded-lg border border-border bg-background p-3 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
+          className="mt-3 w-full resize-y rounded-lg border border-border bg-background p-3 text-sm outline-none transition focus:border-brand"
           placeholder="Describe what students will learn in this course…"
         />
         <div className="mt-3 flex items-center justify-between">
@@ -107,7 +107,7 @@ export default function CourseEditor({ course }: { course: Course }) {
         {syllabus ? (
           <div className="mt-3 flex items-center justify-between rounded-lg border border-border bg-background p-3">
             <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand-ink">
                 <FileIcon />
               </span>
               <div>
@@ -121,7 +121,7 @@ export default function CourseEditor({ course }: { course: Course }) {
             <button
               type="button"
               onClick={() => removeSyllabus(course.id)}
-              className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:border-red-400 hover:text-red-600"
+              className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:border-red-400 hover:text-negative"
             >
               Remove
             </button>
@@ -149,7 +149,7 @@ export default function CourseEditor({ course }: { course: Course }) {
             Supabase Storage will handle real uploads later.
           </p>
           {fileError && (
-            <p className="mt-2 text-xs text-red-600">{fileError}</p>
+            <p className="mt-2 text-xs text-negative">{fileError}</p>
           )}
         </div>
       </div>

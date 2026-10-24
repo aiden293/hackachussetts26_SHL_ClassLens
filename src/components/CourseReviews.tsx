@@ -34,19 +34,19 @@ export default function CourseReviews({ courseId }: { courseId: string }) {
                 <span className="text-sm font-medium">{review.author}</span>
                 <span className="text-xs text-muted">· {review.semester}</span>
               </div>
-              <span className="flex items-center gap-1 text-sm font-medium text-amber-500">
+              <span className="flex items-center gap-1 text-sm font-medium text-rating-ink">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className="h-4 w-4"
+                  className="h-4 w-4 text-amber-500"
                 >
                   <path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.8 6.1 20.8l1.2-6.6L2.5 9.6l6.6-.9z" />
                 </svg>
                 {review.rating}
               </span>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
+            <p className="mt-3 max-w-prose text-base leading-relaxed text-foreground">
               {review.body}
             </p>
             <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted">

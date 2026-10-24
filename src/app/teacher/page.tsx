@@ -32,7 +32,7 @@ function TeacherPortal() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
       <div className="flex items-center gap-3">
-        <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand">
+        <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-ink">
           Teacher portal
         </span>
         {user?.department && (
@@ -71,7 +71,7 @@ function TeacherPortal() {
                       : "border-border bg-card hover:border-brand"
                   }`}
                 >
-                  <div className="font-mono text-xs font-medium text-brand">
+                  <div className="font-mono text-xs font-medium text-brand-ink">
                     {course.code}
                   </div>
                   <div className="mt-0.5 line-clamp-2 text-sm font-medium">
@@ -96,7 +96,7 @@ function TeacherPortal() {
                     </h2>
                     <Link
                       href={`/courses/${selected.id}`}
-                      className="text-sm font-medium text-brand hover:underline"
+                      className="text-sm font-medium text-brand-ink hover:underline"
                     >
                       View public page →
                     </Link>
