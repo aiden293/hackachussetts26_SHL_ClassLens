@@ -2,6 +2,7 @@
 
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { CourseEditsProvider } from "@/lib/courses/CourseEditsProvider";
+import { DiscussionsProvider } from "@/lib/discussions/DiscussionsProvider";
 
 /**
  * Client-side context providers that wrap the whole app.
@@ -10,7 +11,9 @@ import { CourseEditsProvider } from "@/lib/courses/CourseEditsProvider";
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
-      <CourseEditsProvider>{children}</CourseEditsProvider>
+      <CourseEditsProvider>
+        <DiscussionsProvider>{children}</DiscussionsProvider>
+      </CourseEditsProvider>
     </AuthProvider>
   );
 }

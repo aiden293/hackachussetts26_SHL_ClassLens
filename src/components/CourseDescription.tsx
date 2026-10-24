@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useCourseEdits } from "@/lib/courses/CourseEditsProvider";
+import PdfViewerModal from "@/components/PdfViewerModal";
 
 /**
  * Renders a course's description with any teacher edits applied, the uploaded
@@ -20,6 +22,8 @@ export default function CourseDescription({
   const { user, isTeacher } = useAuth();
   const { getEdit } = useCourseEdits();
   const edit = getEdit(courseId);
+
+  const [viewerOpen, setViewerOpen] = useState(false);
 
   const description = edit?.description ?? fallbackDescription;
   const syllabus = edit?.syllabus;
@@ -51,15 +55,23 @@ export default function CourseDescription({
             <p className="text-sm font-medium">Syllabus available</p>
             <p className="text-xs text-muted">{syllabus.fileName}</p>
           </div>
-          <a
-            href={syllabus.dataUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => setViewerOpen(true)}
             className="rounded-lg border border-brand px-3 py-1.5 text-xs font-medium text-brand-ink transition-colors hover:bg-brand/5"
           >
             View syllabus
-          </a>
+          </button>
         </div>
+      )}
+
+      {syllabus && (
+        <PdfViewerModal
+          open={viewerOpen}
+          onClose={() => setViewerOpen(false)}
+          src={syllabus.dataUrl}
+          fileName={syllabus.fileName}
+        />
       )}
 
       {images.length > 0 && (

@@ -94,9 +94,9 @@ src/
 │   ├── teacher/page.tsx      # Teacher portal (edit + review analyzer)
 │   ├── dashboard/page.tsx    # Student dashboard
 │   ├── signin/page.tsx       # Mock demo-account sign-in
-│   ├── professors/           # Placeholder
-│   ├── reviews/              # Placeholder
-│   ├── discussions/          # Placeholder
+│   ├── professors/page.tsx   # Professor search + list
+│   ├── reviews/page.tsx      # Search by course name → that course's reviews
+│   ├── discussions/page.tsx  # Reddit-style threads (sort, vote, create post)
 │   ├── recommend/            # AI recommendations placeholder
 │   └── not-found.tsx         # Custom 404
 ├── components/               # Reusable UI components

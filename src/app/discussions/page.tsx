@@ -1,26 +1,21 @@
-import ComingSoon from "@/components/ComingSoon";
+import { Suspense } from "react";
+import DiscussionsClient from "@/components/DiscussionsClient";
+
+// The discussions UI sorts by a time-decayed "hot" score that reads the current
+// time during render, which is dynamic. Opt the route out of static
+// prerendering (Next.js 16 Cache Components) so it renders per request.
+export const instant = false;
 
 export default function DiscussionsPage() {
   return (
-    <ComingSoon
-      title="Discussions"
-      description="Reddit-style threads for every course. Ask questions, share notes, and work through tough material with your classmates."
-      icon={
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-7 w-7"
-        >
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-5xl px-4 py-12 text-muted sm:px-6">
+          Loading discussions…
+        </div>
       }
-      ctaLabel="Browse courses"
-      ctaHref="/courses"
-    />
+    >
+      <DiscussionsClient />
+    </Suspense>
   );
 }

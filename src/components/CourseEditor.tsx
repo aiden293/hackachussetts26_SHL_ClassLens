@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import type { Course } from "@/lib/data/courses";
 import { useCourseEdits } from "@/lib/courses/CourseEditsProvider";
+import PdfViewerModal from "@/components/PdfViewerModal";
 
 // Limits are kept modest because the demo persists files in localStorage
 // (~5 MB total per origin). Supabase Storage will lift these later.
@@ -49,6 +50,7 @@ export default function CourseEditor({ course }: { course: Course }) {
   const [syllabusError, setSyllabusError] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
 
   const syllabusInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -188,14 +190,13 @@ export default function CourseEditor({ course }: { course: Course }) {
               </div>
             </div>
             <div className="flex gap-2">
-              <a
-                href={syllabus.dataUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => setViewerOpen(true)}
                 className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:border-brand"
               >
                 View
-              </a>
+              </button>
               <button
                 type="button"
                 onClick={() => removeSyllabus(course.id)}
@@ -305,6 +306,15 @@ export default function CourseEditor({ course }: { course: Course }) {
           )}
         </div>
       </div>
+
+      {syllabus && (
+        <PdfViewerModal
+          open={viewerOpen}
+          onClose={() => setViewerOpen(false)}
+          src={syllabus.dataUrl}
+          fileName={syllabus.fileName}
+        />
+      )}
     </div>
   );
 }
