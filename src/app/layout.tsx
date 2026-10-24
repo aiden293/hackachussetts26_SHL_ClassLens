@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -32,11 +34,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           HTML is sent, which otherwise triggers a hydration mismatch warning.
           This only suppresses attribute diffs on <body> itself, not its tree. */}
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
-        <Providers>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </Providers>
+        <ClerkProvider>
+          <Providers>
+            <Suspense
+              fallback={
+                <div className="h-16 border-b border-border bg-card" />
+              }
+            >
+              <Navbar />
+            </Suspense>
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </Providers>
+        </ClerkProvider>
       </body>
     </html>
   );

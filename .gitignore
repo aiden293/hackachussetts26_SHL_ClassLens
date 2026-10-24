@@ -32,6 +32,14 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# any *.env file (e.g. scripts/catalog.env holds BU catalog DB credentials)
+*.env
+!*.env.example
+# importer output may contain bulky catalog data; keep credentials-adjacent dirs clean
+scripts/catalog.env
+# generated scratch artifacts from the catalog importer
+scripts/out/
+scripts/out_explore.txt
 
 # vercel
 .vercel

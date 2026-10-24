@@ -5,7 +5,6 @@ const footerLinks = [
     title: "Discover",
     links: [
       { href: "/courses", label: "Browse courses" },
-      { href: "/professors", label: "Find professors" },
       { href: "/recommend", label: "AI recommendations" },
     ],
   },

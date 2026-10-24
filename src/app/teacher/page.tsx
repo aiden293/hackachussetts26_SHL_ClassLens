@@ -6,7 +6,7 @@ import RequireAuth from "@/components/RequireAuth";
 import CourseEditor from "@/components/CourseEditor";
 import ReviewAnalyzer from "@/components/ReviewAnalyzer";
 import { useAuth } from "@/lib/auth/AuthProvider";
-import { getCoursesByOwner } from "@/lib/data/courses";
+import { sampleCourses } from "@/lib/data/courses";
 import { getReviewsByCourse } from "@/lib/data/reviews";
 
 type Tab = "manage" | "analyze";
@@ -21,7 +21,9 @@ export default function TeacherPortalPage() {
 
 function TeacherPortal() {
   const { user } = useAuth();
-  const courses = user ? getCoursesByOwner(user.id) : [];
+  // Teachers can manage all CS courses in this demo. (Per-teacher ownership
+  // can be reintroduced by matching course.ownerId to the Clerk user id.)
+  const courses = sampleCourses;
   const [selectedId, setSelectedId] = useState<string>(
     courses[0]?.id ?? ""
   );

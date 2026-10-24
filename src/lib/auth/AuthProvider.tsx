@@ -1,21 +1,13 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { demoAccounts, getAccountById } from "./accounts";
-import type { User } from "./types";
+import { createContext, useContext, useMemo } from "react";
+import { useClerk, useUser } from "@clerk/nextjs";
+import type { User, UserRole } from "./types";
 
 type AuthContextValue = {
   user: User | null;
   isLoading: boolean;
-  /** Sign in as a demo account by id (mock). */
-  signIn: (userId: string) => void;
+  /** Sign the current user out (delegates to Clerk). */
   signOut: () => void;
   isTeacher: boolean;
   isStudent: boolean;
@@ -23,74 +15,70 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const STORAGE_KEY = "classlens.auth.userId";
-
-/**
- * Mock auth provider backed by localStorage.
- *
- * Replace the body of signIn/signOut and the initial load with Supabase auth
- * (createClient().auth) when the backend is connected — the context shape can
- * stay the same so consumers don't change.
- */
-/** Read the persisted session synchronously (client only). */
-function loadPersistedUser(): User | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const id = window.localStorage.getItem(STORAGE_KEY);
-    if (!id) return null;
-    return getAccountById(id) ?? null;
-  } catch {
-    return null;
-  }
+/** Derive 2-letter initials from a display name. */
+function initials(name: string): string {
+  const parts = name
+    .replace(/^(dr|prof|professor|mr|ms|mrs)\.?\s+/i, "")
+    .trim()
+    .split(/\s+/);
+  const letters = parts
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
+  return letters || "U";
 }
 
+/**
+ * Auth provider backed by Clerk.
+ *
+ * Exposes the same shape the app has always consumed ({ user, isLoading,
+ * isTeacher, isStudent, signOut }) so existing components don't need to change.
+ * The user's role lives in Clerk `publicMetadata.role` and defaults to
+ * "student" when unset. Promote a user to teacher by setting
+ * publicMetadata.role = "teacher" in the Clerk dashboard.
+ */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isLoaded, isSignedIn, user: clerkUser } = useUser();
+  const clerk = useClerk();
 
-  // Restore session after mount. We hydrate with `null` to match the server
-  // render, then sync from localStorage once on the client. The post-hydration
-  // read is a deliberate sync-from-external-store, which is why the lint rule
-  // is suppressed here.
-  useEffect(() => {
-    const restored = loadPersistedUser();
-    /* eslint-disable react-hooks/set-state-in-effect */
-    if (restored) setUser(restored);
-    setIsLoading(false);
-    /* eslint-enable react-hooks/set-state-in-effect */
-  }, []);
+  const value = useMemo<AuthContextValue>(() => {
+    const isLoading = !isLoaded;
 
-  const signIn = useCallback((userId: string) => {
-    const account = getAccountById(userId);
-    if (!account) return;
-    setUser(account);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, account.id);
-    } catch {
-      // ignore persistence failure
+    let user: User | null = null;
+    if (isSignedIn && clerkUser) {
+      const name =
+        clerkUser.fullName ||
+        clerkUser.username ||
+        clerkUser.primaryEmailAddress?.emailAddress ||
+        "User";
+      const email = clerkUser.primaryEmailAddress?.emailAddress ?? "";
+      const roleMeta = clerkUser.publicMetadata?.role;
+      const role: UserRole = roleMeta === "teacher" ? "teacher" : "student";
+      const department =
+        typeof clerkUser.publicMetadata?.department === "string"
+          ? (clerkUser.publicMetadata.department as string)
+          : undefined;
+
+      user = {
+        id: clerkUser.id,
+        name,
+        email,
+        role,
+        department,
+        avatarInitials: initials(name),
+      };
     }
-  }, []);
 
-  const signOut = useCallback(() => {
-    setUser(null);
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  const value = useMemo<AuthContextValue>(
-    () => ({
+    return {
       user,
       isLoading,
-      signIn,
-      signOut,
+      signOut: () => {
+        void clerk.signOut();
+      },
       isTeacher: user?.role === "teacher",
       isStudent: user?.role === "student",
-    }),
-    [user, isLoading, signIn, signOut]
-  );
+    };
+  }, [isLoaded, isSignedIn, clerkUser, clerk]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
@@ -102,6 +90,3 @@ export function useAuth(): AuthContextValue {
   }
   return ctx;
 }
-
-/** Re-export for convenience in sign-in UI. */
-export { demoAccounts };

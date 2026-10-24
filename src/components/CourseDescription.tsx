@@ -28,7 +28,11 @@ export default function CourseDescription({
   const description = edit?.description ?? fallbackDescription;
   const syllabus = edit?.syllabus;
   const images = edit?.images ?? [];
-  const isOwner = isTeacher && user?.id === ownerId;
+  // In this demo any teacher can manage any CS course, so show the edit entry
+  // to teachers. (`ownerId`/`user` kept for when per-teacher ownership returns.)
+  void ownerId;
+  void user;
+  const isOwner = isTeacher;
 
   return (
     <div className="mt-8">

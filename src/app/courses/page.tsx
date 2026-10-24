@@ -108,24 +108,26 @@ function CourseCard({ course }: { course: Course }) {
         <span className="font-mono text-sm font-medium text-brand-ink">
           {course.code}
         </span>
-        <span className="flex items-center gap-1 text-sm font-medium text-rating-ink">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="h-4 w-4 text-amber-500"
-          >
-            <path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.8 6.1 20.8l1.2-6.6L2.5 9.6l6.6-.9z" />
-          </svg>
-          {course.rating.toFixed(1)}
-        </span>
+        {course.reviewsCount > 0 && (
+          <span className="flex items-center gap-1 text-sm font-medium text-rating-ink">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="h-4 w-4 text-amber-500"
+            >
+              <path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.8 6.1 20.8l1.2-6.6L2.5 9.6l6.6-.9z" />
+            </svg>
+            {course.rating.toFixed(1)}
+          </span>
+        )}
       </div>
       <h2 className="mt-2 font-semibold leading-snug">{course.title}</h2>
       <p className="mt-1 line-clamp-2 text-sm text-muted">
         {course.description}
       </p>
       <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-sm text-muted">
-        <span>{course.professor}</span>
+        <span>{course.semester}</span>
         <span>{course.credits} credits</span>
       </div>
     </Link>

@@ -2,6 +2,7 @@
 
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { CourseEditsProvider } from "@/lib/courses/CourseEditsProvider";
+import { SavedCoursesProvider } from "@/lib/courses/SavedCoursesProvider";
 import { DiscussionsProvider } from "@/lib/discussions/DiscussionsProvider";
 
 /**
@@ -12,7 +13,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       <CourseEditsProvider>
-        <DiscussionsProvider>{children}</DiscussionsProvider>
+        <SavedCoursesProvider>
+          <DiscussionsProvider>{children}</DiscussionsProvider>
+        </SavedCoursesProvider>
       </CourseEditsProvider>
     </AuthProvider>
   );

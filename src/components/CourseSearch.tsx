@@ -96,14 +96,16 @@ export default function CourseSearch() {
                 <span className="font-mono text-sm font-medium text-brand-ink">
                   {course.code}
                 </span>
-                <span className="flex items-center gap-1 text-xs text-muted">
-                  <Star /> {course.rating.toFixed(1)}
-                </span>
+                {course.reviewsCount > 0 && (
+                  <span className="flex items-center gap-1 text-xs text-muted">
+                    <Star /> {course.rating.toFixed(1)}
+                  </span>
+                )}
               </div>
               <p className="mt-0.5 truncate text-sm text-foreground">
                 {course.title}
               </p>
-              <p className="truncate text-xs text-muted">{course.professor}</p>
+              <p className="truncate text-xs text-muted">{course.semester}</p>
             </Link>
           ))}
         </div>

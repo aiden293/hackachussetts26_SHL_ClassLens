@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getCourseById, sampleCourses } from "@/lib/data/courses";
 import CourseDescription from "@/components/CourseDescription";
 import CourseReviews from "@/components/CourseReviews";
+import SaveCourseButton from "@/components/SaveCourseButton";
 
 type Params = { id: string };
 
@@ -47,18 +48,31 @@ export default async function CourseDetailPage({
             {course.semester}
           </span>
         </div>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-          {course.title}
-        </h1>
-        <p className="mt-2 text-lg text-muted">{course.professor}</p>
+        <div className="mt-3 flex items-start justify-between gap-4">
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            {course.title}
+          </h1>
+          <SaveCourseButton courseId={course.id} className="mt-1 shrink-0" />
+        </div>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-border bg-card p-4 text-center">
-          <div className="text-2xl font-bold text-rating-ink">
-            {course.rating.toFixed(1)}
-          </div>
-          <div className="text-xs text-muted">Rating ({course.reviewsCount} reviews)</div>
+          {course.reviewsCount > 0 ? (
+            <>
+              <div className="text-2xl font-bold text-rating-ink">
+                {course.rating.toFixed(1)}
+              </div>
+              <div className="text-xs text-muted">
+                Rating ({course.reviewsCount} reviews)
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-2xl font-bold text-muted">—</div>
+              <div className="text-xs text-muted">No reviews yet</div>
+            </>
+          )}
         </div>
         <div className="rounded-xl border border-border bg-card p-4 text-center">
           <div className="text-2xl font-bold">{course.credits}</div>

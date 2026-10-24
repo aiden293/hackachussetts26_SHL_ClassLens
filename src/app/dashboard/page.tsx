@@ -3,7 +3,8 @@
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
 import { useAuth } from "@/lib/auth/AuthProvider";
-import { sampleCourses } from "@/lib/data/courses";
+import { getCourseById } from "@/lib/data/courses";
+import { useSavedCourses } from "@/lib/courses/SavedCoursesProvider";
 
 export default function DashboardPage() {
   return (
@@ -15,9 +16,11 @@ export default function DashboardPage() {
 
 function Dashboard() {
   const { user } = useAuth();
+  const { savedIds } = useSavedCourses();
 
-  // Demo "saved" courses — a stand-in for a real saved/enrolled list.
-  const savedCourses = sampleCourses.slice(0, 3);
+  const savedCourses = savedIds
+    .map((id) => getCourseById(id))
+    .filter((c): c is NonNullable<typeof c> => Boolean(c));
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
@@ -64,23 +67,31 @@ function Dashboard() {
             Browse all →
           </Link>
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          {savedCourses.map((course) => (
-            <Link
-              key={course.id}
-              href={`/courses/${course.id}`}
-              className="rounded-xl border border-border bg-card p-5 transition-colors hover:border-brand"
-            >
-              <div className="font-mono text-sm font-medium text-brand-ink">
-                {course.code}
-              </div>
-              <h3 className="mt-2 line-clamp-2 font-semibold leading-snug">
-                {course.title}
-              </h3>
-              <p className="mt-1 text-sm text-muted">{course.professor}</p>
-            </Link>
-          ))}
-        </div>
+        {savedCourses.length === 0 ? (
+          <div className="mt-4 rounded-xl border border-dashed border-border p-10 text-center text-muted">
+            You haven&apos;t saved any courses yet. Browse the catalog and hit{" "}
+            <span className="font-medium text-foreground">Save</span> on a
+            course to pin it here.
+          </div>
+        ) : (
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            {savedCourses.map((course) => (
+              <Link
+                key={course.id}
+                href={`/courses/${course.id}`}
+                className="rounded-xl border border-border bg-card p-5 transition-colors hover:border-brand"
+              >
+                <div className="font-mono text-sm font-medium text-brand-ink">
+                  {course.code}
+                </div>
+                <h3 className="mt-2 line-clamp-2 font-semibold leading-snug">
+                  {course.title}
+                </h3>
+                <p className="mt-1 text-xs text-muted">{course.semester}</p>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Activity placeholder */}

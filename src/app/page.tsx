@@ -2,20 +2,17 @@ import Link from "next/link";
 import CourseSearch from "@/components/CourseSearch";
 import { sampleCourses } from "@/lib/data/courses";
 
-// Derive headline stats from the actual catalog so they stay accurate as the
-// course list changes (currently scoped to CS).
-const uniqueProfessors = new Set(sampleCourses.map((c) => c.professor)).size;
-const totalReviews = sampleCourses.reduce((sum, c) => sum + c.reviewsCount, 0);
-const avgRating =
-  sampleCourses.length > 0
-    ? sampleCourses.reduce((sum, c) => sum + c.rating, 0) / sampleCourses.length
-    : 0;
+// Headline stats derived from the real BU catalog data we imported.
+const termSet = new Set<string>();
+for (const c of sampleCourses) {
+  for (const s of c.schedule ?? []) termSet.add(s.term);
+}
 
 const stats = [
-  { label: "Courses", value: String(sampleCourses.length) },
-  { label: "Professors", value: String(uniqueProfessors) },
-  { label: "Reviews", value: totalReviews.toLocaleString() },
-  { label: "Avg. rating", value: avgRating.toFixed(1) },
+  { label: "CS courses", value: String(sampleCourses.length) },
+  { label: "Department", value: "CAS CS" },
+  { label: "Terms", value: String(termSet.size || 2) },
+  { label: "Source", value: "BU Catalog" },
 ];
 
 const features = [
@@ -118,10 +115,11 @@ export default function Home() {
         <div className="flex items-end justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">
-              Popular this semester
+              Featured CS courses
             </h2>
             <p className="mt-1 text-muted">
-              The courses BU students are talking about most.
+              Real courses from the BU catalog — explore and save the ones you
+              want.
             </p>
           </div>
           <Link
@@ -145,22 +143,9 @@ export default function Home() {
               <h3 className="mt-2 line-clamp-2 font-semibold leading-snug">
                 {course.title}
               </h3>
-              <p className="mt-1 text-sm text-muted">{course.professor}</p>
-              <div className="mt-4 flex items-center justify-between text-sm">
-                <span className="flex items-center gap-1 font-medium text-rating-ink">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="h-4 w-4 text-amber-500"
-                  >
-                    <path d="M12 2l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.8 6.1 20.8l1.2-6.6L2.5 9.6l6.6-.9z" />
-                  </svg>
-                  {course.rating.toFixed(1)}
-                </span>
-                <span className="text-muted">
-                  {course.reviewsCount} reviews
-                </span>
+              <div className="mt-4 flex items-center justify-between text-sm text-muted">
+                <span>{course.semester}</span>
+                <span>{course.credits} credits</span>
               </div>
             </Link>
           ))}

@@ -104,7 +104,7 @@ export default function ReviewsPage() {
                 {selected.code}
               </span>
               <h2 className="font-semibold">{selected.title}</h2>
-              <p className="text-sm text-muted">{selected.professor}</p>
+              <p className="text-sm text-muted">{selected.semester}</p>
             </div>
             <Link
               href={`/courses/${selected.id}`}
