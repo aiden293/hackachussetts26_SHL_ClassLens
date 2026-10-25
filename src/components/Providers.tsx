@@ -4,6 +4,7 @@ import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { CourseEditsProvider } from "@/lib/courses/CourseEditsProvider";
 import { SavedCoursesProvider } from "@/lib/courses/SavedCoursesProvider";
 import { DiscussionsProvider } from "@/lib/discussions/DiscussionsProvider";
+import { UserReviewsProvider } from "@/lib/reviews/UserReviewsProvider";
 
 /**
  * Client-side context providers that wrap the whole app.
@@ -14,7 +15,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     <AuthProvider>
       <CourseEditsProvider>
         <SavedCoursesProvider>
-          <DiscussionsProvider>{children}</DiscussionsProvider>
+          <UserReviewsProvider>
+            <DiscussionsProvider>{children}</DiscussionsProvider>
+          </UserReviewsProvider>
         </SavedCoursesProvider>
       </CourseEditsProvider>
     </AuthProvider>
